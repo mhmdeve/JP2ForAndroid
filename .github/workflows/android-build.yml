@@ -1,0 +1,62 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_HOME_11_X64: /usr/lib/jvm/java-11-openjdk-amd64
+
+    steps:
+      # --------------------------
+      # Checkout source code
+      # --------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --------------------------
+      # Setup JDK 11 (recommended for older Gradle builds)
+      # --------------------------
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      # --------------------------
+      # Setup Android SDK + NDK
+      # --------------------------
+      - name: Install Android SDK + NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: sdkmanager "ndk;25.2.9519653"
+
+      # --------------------------
+      # Make Gradle wrapper executable
+      # --------------------------
+      - name: Grant execute permission to Gradle
+        run: chmod +x ./gradlew
+
+      # --------------------------
+      # Build with Gradle
+      # --------------------------
+      - name: Build Android library & app
+        run: ./gradlew clean assembleRelease --stacktrace
+
+      # --------------------------
+      # Upload build outputs
+      # --------------------------
+      - name: Upload artifacts AAR / APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-output
+          path: |
+            **/build/outputs/**/*.aar
+            **/build/outputs/**/*.apk
+            **/build/outputs/**/*.so

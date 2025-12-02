@@ -14,6 +14,7 @@ import com.gemalto.jp2.JP2Decoder;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import com.gemalto.openjpeg.test.R;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
